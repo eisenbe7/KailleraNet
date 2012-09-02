@@ -1,0 +1,27 @@
+2012-07-02 21:04:56,697 [11] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 3with sequence number: 0
+2012-07-02 21:04:56,746 [11] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 6with sequence number: 1
+2012-07-02 21:04:56,789 [11] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 6with sequence number: 2
+2012-07-02 21:04:56,816 [11] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 6with sequence number: 3
+2012-07-02 21:04:56,851 [11] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 6with sequence number: 4
+2012-07-02 21:05:26,718 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 5
+2012-07-02 21:05:26,718 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 5
+2012-07-02 21:05:56,722 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 6
+2012-07-02 21:05:56,722 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 6
+2012-07-02 21:06:26,773 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 7
+2012-07-02 21:06:26,773 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 7
+2012-07-02 21:06:56,779 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 8
+2012-07-02 21:06:56,779 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 8
+2012-07-02 21:07:26,781 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 9
+2012-07-02 21:07:26,781 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 9
+2012-07-02 21:07:56,782 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 10
+2012-07-02 21:07:56,782 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 10
+2012-07-02 21:08:26,784 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 11
+2012-07-02 21:08:26,784 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 11
+2012-07-02 21:08:56,787 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 12
+2012-07-02 21:08:56,787 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 12
+2012-07-02 21:09:26,787 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 13
+2012-07-02 21:09:26,787 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 13
+2012-07-02 21:09:56,790 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 14
+2012-07-02 21:09:56,790 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 14
+2012-07-02 21:10:26,792 [12] INFO  WpfApplication1.KailleraInstruction ==> Creating new instruction with id: 9with sequence number: 15
+2012-07-02 21:10:26,792 [12] INFO  WpfApplication1.KailleraMananger ==> Sending keepalive packer to 69.172.242.150:27953with seq number 15

@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace KailleraNET
+{
+    public class Game
+    {
+        public string name;
+        public int id;
+        public string emuName;
+        public string users_count;
+        public int numPlayers;
+        public int maxPlayers;
+        public byte status;     //Bytes 1 and/or 2 set
+        public UserList users = new UserList();
+        public User host;
+        public string host_name;
+
+        public string Users_count
+        {
+            get
+            {
+                return users_count;
+            }
+            set
+            {
+                users_count = value;
+                numPlayers = int.Parse(value[0].ToString());
+                maxPlayers = int.Parse(value[value.IndexOf('/')+1].ToString());
+            }
+
+        }
+
+
+
+        public Game()
+        {
+        }
+
+        /// <summary>
+        /// Constructor for creating a game with a specific id
+        /// Called when user creates new game
+        /// </summary>
+        /// <param name="id"></param>
+        public Game(int id)
+        {
+            this.id = id;
+        }
+    }
+}
