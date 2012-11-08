@@ -56,6 +56,7 @@ namespace KailleraNET
         public int CompareToName(Object obj)
         {
             User u = obj as User;
+            
             return Name.CompareTo(u.Name);
         }
 

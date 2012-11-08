@@ -26,9 +26,11 @@ namespace KailleraNET
             }
             set
             {
+                if (value == null || !value.Contains('/')) return;
                 users_count = value;
-                numPlayers = int.Parse(value[0].ToString());
-                maxPlayers = int.Parse(value[value.IndexOf('/')+1].ToString());
+                string[] playerCount = users_count.Split('/');
+                numPlayers = int.Parse(users_count[0].ToString());
+                maxPlayers = int.Parse(playerCount[1].ToString());
             }
 
         }

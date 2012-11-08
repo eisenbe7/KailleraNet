@@ -61,8 +61,8 @@ namespace KailleraNET
 
         public void addBytes(byte[] content, ref byte[] buff, int index, int length)
         {
-            length += content.Length;
-            Array.Copy(content, 0, buff, index, length);
+            this.length += content.Length;
+            Array.Copy(content, 0, buff, index, content.Length);
         }
 
 

@@ -17,3 +17,9 @@ C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplicat
 C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\obj\x86\Debug\KailleraNET.Properties.Resources.resources
 C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\obj\x86\Debug\GenerateResource.read.1.tlog
 C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\obj\x86\Debug\Windows\ServerListWindow.baml
+C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\obj\x86\Debug\Windows\ServerListWindow.g.cs
+C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\bin\Debug\WpfApplication1.exe.manifest
+C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\bin\Debug\WpfApplication1.application
+C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\obj\x86\Debug\WpfApplication1.exe.manifest
+C:\Users\David\Documents\Visual Studio 2010\Projects\WpfApplication1\WpfApplication1\obj\x86\Debug\WpfApplication1.application

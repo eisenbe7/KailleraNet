@@ -5,9 +5,12 @@ using System.Text;
 
 namespace KailleraNET.Instructions
 {
+    /// <summary>
+    /// Instruction to log out of the kaillera server
+    /// </summary>
     class Logout : KailleraInstruction
     {
-        string exitMessage = "Using KailleraNET 0.1!";
+        public string exitMessage = "Using KailleraNET 0.1! New client coming soon!";
 
         public Logout() 
             : base(1, false)

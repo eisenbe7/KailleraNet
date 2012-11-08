@@ -14,7 +14,9 @@ using System.Windows.Shapes;
 using System.Net;
 using System.Threading;
 using System.ComponentModel;
+using KailleraNET.Util;
 using log4net;
+using KailleraNET.Views;
 
 namespace KailleraNET
 {
@@ -24,54 +26,141 @@ namespace KailleraNET
     public partial class MainWindow : Window
     {
 
+        IPAddress ip;
+        int port;
+        bool selectedServerFromList;
+
+        ServerListView serverList;
+
         KailleraWindowMananger k = new KailleraWindowMananger();
+        SettingsManager settings = new SettingsManager();
 
         public MainWindow()
         {
             InitializeComponent();
-            textBox1.Text = "UserName";
-            textBox2.Text = "66.175.211.87:27888";
+            addServersToComboBox();
+            addUsernamesToComboBox();
+        }
+
+        /// <summary>
+        /// Populates the username combobox with usernames
+        /// </summary>
+        private void addUsernamesToComboBox()
+        {
+            foreach (String name in settings.getUsernames())
+            {
+                usernameBox.Items.Add(name);
+            }
+            usernameBox.Text = usernameBox.Items[0].ToString();
+        }
+
+        /// <summary>
+        /// Populates the server combobox with server names
+        /// </summary>
+        private void addServersToComboBox()
+        {
+            foreach (KeyValuePair<string, string> entry in settings.getServers())
+            {
+                serverBox.Items.Add(entry.Key + "," + entry.Value);
+            }
+            serverBox.Text = serverBox.Items[0].ToString();
         }
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            string username = textBox1.Text;
+            string username = usernameBox.Text;
             if (username.Equals(""))
             {
                 MessageBox.Show("Error - You must enter a username.", "Please enter a username.");
                 return;
             }
 
-            IPAddress ip;
-            int port;
-
             try
             {
-                string[] args = textBox2.Text.Split(':');
-                ip = IPAddress.Parse(args[0]);
-                port = int.Parse(args[1]);
+                parseIPString(ref ip, ref port, serverBox.Text);
+                if (ip == null)
+                {
+                    throw new ArgumentException();
+                }
             }
             catch (Exception)
             {
-                MessageBox.Show("Error - cannot read ip address.  Format is <ip>:<port>.", "IP Error");
+                MessageBox.Show("Error - cannot read ip address.  Format is <name>,<ip>:<port>.", "IP Error");
                 return;
             }
-/*
-            ChatWindow wind = new ChatWindow();
-            wind.Closed += connectionClosed;
-            wind.Show();
-            wind.Start(ip, port, username);
- */
+
+            settings.addUsername(username);
+            /*
+                        ChatWindow wind = new ChatWindow();
+                        wind.Closed += connectionClosed;
+                        wind.Show();
+                        wind.Start(ip, port, username);
+             */
             this.Visibility = Visibility.Hidden;
 
-          k.BeginNewConnection(ip, port, username);
-          this.Close();
+            k.BeginNewConnection(ip, port, username);
+            this.Close();
 
         }
+
+        /// <summary>
+        /// Sets the correct ip and port - iterates first through saved servers and then tries
+        /// to parse text directly
+        /// </summary>
+        /// <param name="ip">ip to set</param>
+        /// <param name="port">port to set</param>
+        /// <param name="text">text to parse</param>
+        private void parseIPString(ref IPAddress ip, ref int port, string text)
+        {
+            bool shouldSplit = false;
+            string searchText = text;
+            if (text.Contains(','))
+            {
+                searchText = text.Split(',')[0];
+                shouldSplit = true;
+            }
+
+            foreach (var entry in settings.getServers())
+            {
+                if (searchText.Equals(entry.Key))
+                {
+                    string[] ipPort = entry.Value.Split(':');
+                    IPAddress.TryParse(ipPort[0], out ip);
+                    int.TryParse(ipPort[1], out port);
+                    return;
+                }
+            }
+
+            if (shouldSplit) searchText = text.Split(',')[1];
+
+            //Directly entered ip:port
+            string[] args = searchText.Split(':');
+            IPAddress.TryParse(args[0], out ip);
+            int.TryParse(args[1], out port);
+            if(!selectedServerFromList)
+                settings.addServer("Server", searchText);
+            selectedServerFromList = false;
+        }
+
 
         private void connectionClosed(object sender, EventArgs e)
         {
             this.Visibility = Visibility.Visible;
+        }
+
+        private void serverListButton_Click(object sender, RoutedEventArgs e)
+        {
+            serverList = new ServerListView();
+            serverList.chooseServer += addAndSelectServer;
+            serverList.begin();
+        }
+
+        public void addAndSelectServer(Server curr)
+        {
+            selectedServerFromList = true;
+            settings.addServer(curr.name, curr.ip.ToString() + ":" + curr.port.ToString());
+            serverBox.Text = curr.name + "," + curr.ip.ToString() + ":" + curr.port.ToString();
+            serverList = null;
         }
     }
 

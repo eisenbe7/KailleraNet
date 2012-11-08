@@ -194,25 +194,25 @@ namespace KailleraNET
                 //Process methods called with offset of index of id of message
                 switch (id)
                 {
-                    case 4:
+                    case UserLoginSuccess:
                         ParseLoginSuccess(msg, currIndex);
                         break;
-                    case 5:
+                    case Ping:
                         ProcessPong();
                         break;
-                    case 2:
+                    case UserJoined:
                         ProcessUserJoin(msg, currIndex);
                         break;
-                    case 1:
+                    case UserLeave:
                         ProcessUserLeave(msg, currIndex);
                         break;
-                    case 10:
+                    case GameCreate:
                         ProcessGameCreate(msg, currIndex);
                         break;
-                    case 16:
+                    case GameClose:
                         ProcessGameClose(msg, currIndex);
                         break;
-                    case 14:
+                    case GameStatus:
                         ProcessGameStatus(msg, currIndex);
                         break;
                     case PlayerJoin:
@@ -520,6 +520,10 @@ namespace KailleraNET
             return true;
         }
 
+        /// <summary>
+        /// Sends multiple messages for chat messages
+        /// </summary>
+        /// <param name="text"></param>
         public void SendServerChatText(string text)
         {
             while(text.Length >= 127)

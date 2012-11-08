@@ -16,8 +16,8 @@ namespace KailleraNET
 
         private static Object mutex = new Object();
 
-
-        private List<KailleraInstruction> Instructions = new List<KailleraInstruction>();
+        //Change back to private
+        public List<KailleraInstruction> Instructions = new List<KailleraInstruction>();
         private IPEndPoint address;
 
         public UDPMessenger(IPEndPoint ip, params KailleraInstruction[] instructions)
