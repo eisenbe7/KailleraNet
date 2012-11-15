@@ -16,14 +16,28 @@ namespace KailleraNET
     /// Buddy List (stored in buddy.txt)
     /// UserNames (stored in username.txt)
     ///  
-    /// </summary>
+    /// </summary>    
+    /// 
+
     public class SettingsManager
     {
         string servers;
         string buddy;
         string username;
+        string privMessages;
+        string test;
         public static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private static SettingsManager instance;
+
+        public static SettingsManager getMgr(string servers = "servers.txt", string buddy = "buddy.txt", string username = "usernames.txt", string privMessages = "pm.txt")
+        {
+            if (instance != null) return instance;
+            else return new SettingsManager(servers, buddy, username, privMessages);
+        }
+
+        private SettingsManager(){
+        }
 
         /// <summary>
         /// Initializes the settings manager.  The default params are the default location of the files
@@ -31,12 +45,14 @@ namespace KailleraNET
         /// <param name="servers"></param>
         /// <param name="buddy"></param>
         /// <param name="username"></param>
-        public SettingsManager(string servers = "servers.txt", string buddy = "buddy.txt", string username = "usernames.txt")
+        private SettingsManager(string servers = "servers.txt", string buddy = "buddy.txt", string username = "usernames.txt", string privMessages = "pm.txt")
         {
             log.Debug("Initializing settings manager");
             this.servers = servers;
             this.buddy = buddy;
             this.username = username;
+            this.privMessages = privMessages;
+            instance = this;
         }
 
         /// <summary>
@@ -169,6 +185,20 @@ namespace KailleraNET
                 usernameWriter.WriteLine(name);
                 usernameWriter.Flush();
                 usernameWriter.Close();
+            }
+        }
+
+        /// <summary>
+        /// Writes the pm to the file
+        /// </summary>
+        /// <param name="pm"></param>
+        public void writePM(string pm)
+        {
+            using (StreamWriter pmWriter = File.AppendText(privMessages))
+            {
+                pmWriter.WriteLine(pm);
+                pmWriter.Flush();
+                pmWriter.Close();
             }
         }
 
