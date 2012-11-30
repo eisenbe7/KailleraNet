@@ -10,7 +10,7 @@ namespace KailleraNET.Instructions
     /// </summary>
     class Logout : KailleraInstruction
     {
-        public string exitMessage = "Using KailleraNET 0.1! New client coming soon!";
+        public string exitMessage = "Using KailleraNET 0.2! New client coming soon! http://goo.gl/q2Tzz";
 
         public Logout() 
             : base(1, false)

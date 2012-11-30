@@ -47,6 +47,7 @@ namespace KailleraNET.Instructions
                 user.id = BitConverter.ToInt16(content, currindex);
                 currindex += 2;
                 user.connection = content[currindex++];
+                user.assignCategory();
                 users.AddUser(user);
             }
 
@@ -78,7 +79,7 @@ namespace KailleraNET.Instructions
                 }
 
 
-                game.host_name = hostUser.ToString();
+                game.gameHost = hostUser.ToString();
                 currindex++;
 
                 StringBuilder usersStr = new StringBuilder();

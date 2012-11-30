@@ -94,7 +94,15 @@ namespace KailleraNET
                 }
 
                 //Now we are ready to send
-                client.Send(buffer, buffer.Length, address);
+                
+                //Race condition:  Client exits but still has another messsage to send
+                //We need to make sure this client is not disposed, it if it is it cannot be used
+                try
+                {
+                    client.Send(buffer, buffer.Length, address);
+                }
+                catch (ObjectDisposedException e)
+                { }
                 Instructions.Clear();
             }
        }

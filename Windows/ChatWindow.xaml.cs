@@ -26,13 +26,16 @@ namespace KailleraNET
     public partial class ChatWindow : Window
     {
         //Delegate to update the users - stupid implementation
-        private delegate void upUsers(List<User> u);
-        upUsers Userup;
+        public delegate void upUsers(List<User> u);
+        public upUsers Userup;
         FlowDocument doc = new FlowDocument();
 
         //UI delegate that calls UI method
         public delegate void UpdateGUI(GUIBundle bundle);
         public UpdateGUI updater;
+
+        public delegate void AddBuddyList(User user);
+        public AddBuddyList addBuddyList;
 
         private ObservableCollection<User> displayUsers = new ObservableCollection<User>();
         private System.Net.IPAddress ip;
@@ -41,6 +44,8 @@ namespace KailleraNET
 
         //zero for main chat
         public int gameNumber;
+
+        public ChatLogger Logger;
 
         private ObservableCollection<User> DisplayUsers
         {
@@ -55,17 +60,19 @@ namespace KailleraNET
 
         }
 
-        public ChatWindow(int gamenum, KailleraWindowMananger mgr)
+        public ChatWindow()
         {
-            gameNumber = gamenum;
-            Userup += UpdateUsers;
+        //    gameNumber = gamenum;
+        //    Userup += UpdateUsers;
             updater += WindowUpdate;
             InitializeComponent();
-            listBox1.ItemsSource = DisplayUsers;
-            //Set small line height to avoid large line breaks
-            Paragraph p = richTextBox1.Document.Blocks.FirstBlock as Paragraph;
-            p.LineHeight = 1;
-            textBox1.KeyDown += mgr.Chat_sendMessageIfEnter;
+        //    listBox1.ItemsSource = DisplayUsers;
+        //    //Set small line height to avoid large line breaks
+        //    Paragraph p = richTextBox1.Document.Blocks.FirstBlock as Paragraph;
+        //    p.LineHeight = 1;
+        //    textBox1.KeyDown += mgr.Chat_sendMessageIfEnter;+
+
+            richTextBox1.IsDocumentEnabled = true;
         }
 
         public void Start(System.Net.IPAddress ip, int port, string username)
@@ -93,7 +100,7 @@ namespace KailleraNET
         /// Updates the window - calls dispatcher so correct thread is invoked
         /// </summary>
         /// <param name="bundle"></param>
-        private void WindowUpdate(GUIBundle bundle)
+        public void WindowUpdate(GUIBundle bundle)
         {
             if (bundle.Users != null)
             {
@@ -130,7 +137,9 @@ namespace KailleraNET
 
                     chatText.ApplyPropertyValue(TextElement.ForegroundProperty, ColorUtil.txtColors[0]);
                     chatText.ApplyPropertyValue(TextElement.FontWeightProperty, FontWeights.Normal);
-       
+
+                    Logger.logChat(bundle.TargetUserString + " - " + bundle.ChatText);
+
                     //We only want the textbox to autoscroll when the scrollbar is at the bottom, otherwise no autoscroll
                     //Code adopted from MSDN: http://social.msdn.microsoft.com/Forums/en-AU/wpf/thread/25a08bda-dc5e-4689-a6b0-7d4d78aff06b
 
@@ -147,11 +156,15 @@ namespace KailleraNET
                     {
                         if (dVer + dViewport == dExtent)
                         {
-                            richTextBox1.Focus();
+                           // richTextBox1.Focus();
                             richTextBox1.ScrollToEnd();
-                            textBox1.Focus();
+                           // textBox1.Focus();
                         }
                     }
+
+
+
+
                 }
                     ));
             }
@@ -183,9 +196,10 @@ namespace KailleraNET
                     {
                         if (dVer + dViewport == dExtent)
                         {
-                            richTextBox1.Focus();
-                            richTextBox1.ScrollToEnd();
-                            textBox1.Focus();
+                                //richTextBox1.Focus();
+                                richTextBox1.ScrollToEnd();
+                                //textBox1.Focus();
+                            
                         }
                     }
                 }
@@ -241,6 +255,14 @@ namespace KailleraNET
         private void richTextBox1_TextChanged(object sender, TextChangedEventArgs e)
         {
 
+        }
+
+        private void addToBuddyList(object sender, EventArgs e)
+        {
+            if (addBuddyList != null && listBox1.SelectedItem != null)
+            {
+                addBuddyList((User)listBox1.SelectedItem);
+            }
         }
 
 

@@ -7,16 +7,16 @@ namespace KailleraNET
 {
     public class Game
     {
-        public string name;
-        public int id;
-        public string emuName;
+        public string name { get; set; }
+        public int id { get; set; }
+        public string emuName { get; set; }
         public string users_count;
         public int numPlayers;
         public int maxPlayers;
-        public byte status;     //Bytes 1 and/or 2 set
+        public byte status;    //Bytes 1 and/or 2 set
         public UserList users = new UserList();
         public User host;
-        public string host_name;
+        public string gameHost { get; set; }
 
         public string Users_count
         {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace KailleraNET
 {
@@ -10,7 +11,16 @@ namespace KailleraNET
     /// </summary>
     public class GameList
     {
-        List<Game> games = new List<Game>();
+        ObservableCollection<Game> games = new ObservableCollection<Game>();
+
+        public ObservableCollection<Game> Games
+        {
+            get
+            {
+                return games;
+            }
+        }
+
         public int numGames;
 
 

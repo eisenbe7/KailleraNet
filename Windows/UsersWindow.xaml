@@ -1,0 +1,34 @@
+﻿<Window x:Class="KailleraNET.Windows.UsersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Users" Height="572" Width="195" Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="23*" />
+            <RowDefinition Height="510*" />
+        </Grid.RowDefinitions>
+        <Menu Height="23" HorizontalAlignment="Stretch" Name="usersMenu" VerticalAlignment="Top" Width="Auto" Grid.RowSpan="2">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Disconnect" Click="beginDisconnect">                    
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <ListBox Grid.Row="1" Height="Auto" HorizontalAlignment="Stretch" Name="usersList" VerticalAlignment="Stretch" Width="Auto" ItemsSource="{Binding}">
+            <ListBox.GroupStyle>
+                <GroupStyle></GroupStyle>
+            </ListBox.GroupStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}">                        
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Add to Buddy List" Click="addToBuddyList">
+                    </MenuItem>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
+    </Grid>
+</Window>

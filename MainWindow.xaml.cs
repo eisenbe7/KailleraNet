@@ -33,7 +33,7 @@ namespace KailleraNET
         ServerListView serverList;
 
         KailleraWindowMananger k = new KailleraWindowMananger();
-        SettingsManager settings = new SettingsManager();
+        SettingsManager settings = SettingsManager.getMgr();
 
         public MainWindow()
         {

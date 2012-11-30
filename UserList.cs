@@ -9,9 +9,22 @@ namespace KailleraNET
     {
         public List<User> users = new List<User>();
         public int numUsers;
+        private UserList users_2;
 
         public UserList()
         {
+        }
+
+        /// <summary>
+        /// Copy constructor to avoid modified collections during iteration
+        /// </summary>
+        /// <param name="users_2"></param>
+        public UserList(UserList users_2)
+        {
+            foreach (var user in users_2.users)
+            {
+                AddUser(user);
+            }
         }
         
         public void AddUser(User user)

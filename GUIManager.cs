@@ -8,6 +8,7 @@ namespace KailleraNET
 {
     /// <summary>
     /// Class that manages application GUI for specific window or instance
+    /// DEPRECATED
     /// </summary>
     class GUIManager
     {
