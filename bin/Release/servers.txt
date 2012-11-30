@@ -1,7 +1,0 @@
-The Galaxy,69.172.242.150:27888
-The Galaxy Backup,66.175.211.87:27888
-Bobz Entertainment EmuLinker Server,72.229.137.212:27888
-Remz Domain - MK server,199.38.181.239:27888
-West Wonderland,69.90.34.55:27894
-Server,69.172.242.150:27888
-Test Server 1,66.175.211.87:27888
