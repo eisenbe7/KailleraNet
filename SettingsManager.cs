@@ -5,6 +5,8 @@ using System.Text;
 using System.IO;
 using log4net;
 using System.Windows;
+using Nini.Config;
+using KailleraNET.Util;
 
 //http://kaillera.com/raw_server_list2.php?version=0.9
 
@@ -21,12 +23,41 @@ namespace KailleraNET
 
     public class SettingsManager
     {
+        public class iniSettings
+        {
+            public bool NotifyBuddyJoinServer = true;
+            public bool NotifyBuddyLeaveServer = true;
+            public bool NotifyBuddyJoinedGame = true;
+            public bool NotifyBuddyLeftGame = true;
+            public bool NotifyPM = true;
+
+            public bool UserJoinedMessage = true;
+            public bool UserLeftMessage = true;
+        }
+
+        Dictionary<TrayFlags.PopValues, Func<bool>> flagFunctor = new Dictionary<TrayFlags.PopValues, Func<bool>>();
+
+        private void initializeDict()
+        {
+            flagFunctor.Add(TrayFlags.PopValues.buddyJoinedGame, () => { return getSettings().NotifyBuddyJoinedGame; });
+            flagFunctor.Add(TrayFlags.PopValues.buddyLeftGame, () => { return getSettings().NotifyBuddyLeftGame; });
+            flagFunctor.Add(TrayFlags.PopValues.buddyJoinedServer, () => { return getSettings().NotifyBuddyJoinServer; });
+            flagFunctor.Add(TrayFlags.PopValues.buddyLeftServer, () => { return getSettings().NotifyBuddyLeaveServer; });
+            flagFunctor.Add(TrayFlags.PopValues.pmRecieved, () => { return getSettings().NotifyPM; });
+
+        }
+
+
+
+
         string servers;
         string buddy;
         string username;
         string privMessages;
         string ignore;
         public static log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        IConfigSource settings = new IniConfigSource("settings.ini");
 
         private static SettingsManager instance;
 
@@ -36,7 +67,9 @@ namespace KailleraNET
             else return new SettingsManager(servers, buddy, username, privMessages, ignore);
         }
 
-        private SettingsManager(){
+        private SettingsManager()
+        {
+            initializeDict();
         }
 
         /// <summary>
@@ -47,6 +80,7 @@ namespace KailleraNET
         /// <param name="username"></param>
         private SettingsManager(string servers = "servers.txt", string buddy = "buddy.txt", string username = "usernames.txt", string privMessages = "pm.txt", string ignore = "ignore.txt")
         {
+            initializeDict();
             log.Debug("Initializing settings manager");
             this.servers = servers;
             this.buddy = buddy;
@@ -95,6 +129,7 @@ namespace KailleraNET
                 while (!usernameReader.EndOfStream)
                 {
                     string userName = usernameReader.ReadLine();
+                    if (String.IsNullOrEmpty(userName) || string.IsNullOrWhiteSpace(userName)) continue;
                     if (userName.Contains('#'))
                     {
                         log.Info("Skipping line in userName list: \"" + userName + "\"");
@@ -151,7 +186,7 @@ namespace KailleraNET
                 }
             }
             return false;
-        }               
+        }
 
         /// <summary>
         /// Adds a server entry to the default file
@@ -164,7 +199,7 @@ namespace KailleraNET
             {
                 return;
             }
-            
+
             using (StreamWriter serverWriter = File.AppendText(servers))
             {
                 serverWriter.WriteLine(name + "," + ip);
@@ -229,6 +264,19 @@ namespace KailleraNET
             return false;
         }
 
+        public Boolean isIgnored(string name)
+        {
+            using (StreamReader ignoreReader = new StreamReader(ignore))
+            {
+                while (!ignoreReader.EndOfStream)
+                {
+                    if (name.Equals(ignoreReader.ReadLine()))
+                        return true;
+                }
+            }
+            return false;
+        }
+
         public void addBuddy(string name)
         {
             if (isBuddy(name)) return;
@@ -241,8 +289,40 @@ namespace KailleraNET
             }
         }
 
+        /// <summary>
+        /// Removes the buddy from the list.
+        /// Note: Overwrites previous file
+        /// </summary>
+        /// <param name="name"></param>
+        public void removeBuddy(string name)
+        {
+            if (!isBuddy(name)) return;
+            
+            List<string> buddies = new List<string>(File.ReadAllLines(buddy));
 
+            buddies.Remove(name);
+            File.WriteAllLines(buddy, buddies);
 
+        }
 
+        public iniSettings getSettings()
+        {
+            iniSettings currSettings = new iniSettings();
+            currSettings.NotifyBuddyJoinServer = settings.Configs["Notifications"].GetInt("NotifyBuddyJoinServer", 1) == 1;
+            currSettings.NotifyBuddyLeftGame = settings.Configs["Notifications"].GetInt("NotifyBuddyLeftServer", 1) == 1;
+            currSettings.NotifyBuddyJoinedGame = settings.Configs["Notifications"].GetInt("NotifyBuddyJoinedGame", 1) == 1;
+            currSettings.NotifyBuddyLeftGame = settings.Configs["Notifications"].GetInt("NotifyBuddyLeftGame", 1) == 1;
+            currSettings.NotifyPM = settings.Configs["Notifications"].GetInt("NotifyPM", 1) == 1;
+            currSettings.UserLeftMessage = settings.Configs["Server Chat"].GetInt("UserJoinedMessage", 1) == 1;
+            currSettings.UserLeftMessage = settings.Configs["Server Chat"].GetInt("UserLeftMessage", 1) == 1;
+
+            return currSettings;
+        }
+
+        internal bool isNotifyEnabled(TrayFlags.PopValues flag)
+        {
+            if(!flagFunctor.ContainsKey(flag)) return false;
+            return flagFunctor[flag].Invoke();
+        }
     }
 }

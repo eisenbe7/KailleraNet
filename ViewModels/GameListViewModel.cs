@@ -14,7 +14,7 @@ namespace KailleraNET.ViewModels
     /// </summary>
     public class GameListViewModel
     {
-        GamesWindow wind;
+        public GamesWindow wind;
         public GameList gameList;
 
         public delegate void JoinGame(Game game);
@@ -41,6 +41,7 @@ namespace KailleraNET.ViewModels
             wind.DataContext = games;
             wind.gameDataGrid.ItemsSource = Games;
             wind.gameDataGrid.MouseDoubleClick += onGameSelected;
+            KailleraTrayManager.Instance.addActiveWindow(wind);
             wind.Show();
         }
 

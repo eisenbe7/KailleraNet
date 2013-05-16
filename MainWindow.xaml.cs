@@ -17,6 +17,9 @@ using System.ComponentModel;
 using KailleraNET.Util;
 using log4net;
 using KailleraNET.Views;
+using System.Windows.Interop;
+using KailleraNET.Hotkeys;
+
 
 namespace KailleraNET
 {
@@ -29,17 +32,42 @@ namespace KailleraNET
         IPAddress ip;
         int port;
         bool selectedServerFromList;
+        private static HotKeyHost hotkeyHost;
+
 
         ServerListView serverList;
 
-        KailleraWindowMananger k = new KailleraWindowMananger();
+        KailleraWindowController k = KailleraWindowController.getMgr();
         SettingsManager settings = SettingsManager.getMgr();
+
+        public static HotKeyHost getHotkey()
+        {
+            return hotkeyHost;
+        }
 
         public MainWindow()
         {
             InitializeComponent();
             addServersToComboBox();
             addUsernamesToComboBox();
+            Loaded += assignHotkeys;
+            Closed += new EventHandler(MainWindow_Closed);
+        }
+
+        private void assignHotkeys(object sender, RoutedEventArgs e)
+        {
+            hotkeyHost = new HotKeyHost((HwndSource)HwndSource.FromVisual(this));
+            hotkeyHost.AddHotKey(new ShowUserListHotkey("ShowUserListHotkey", Key.U, ModifierKeys.Control | ModifierKeys.Shift, true));
+            hotkeyHost.AddHotKey(new ShowServerChatHotkey("ShowServerChatHotkey", Key.S, ModifierKeys.Shift | ModifierKeys.Control, true));
+            hotkeyHost.AddHotKey(new ShowGameListHotkey("ShowGameListHotkey", Key.G, ModifierKeys.Shift | ModifierKeys.Control, true));
+            hotkeyHost.AddHotKey(new BeginDisconnectHotkey("BeginDisconnectHotkey", Key.D, ModifierKeys.Control | ModifierKeys.Shift, true));
+            hotkeyHost.AddHotKey(new MinimizeAllWindowsHotkey("MinimizeAllWindowsHotkey", Key.M, ModifierKeys.Shift | ModifierKeys.Control, true));
+
+        }
+
+        void MainWindow_Closed(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown(0);
         }
 
         /// <summary>
@@ -51,6 +79,7 @@ namespace KailleraNET
             {
                 usernameBox.Items.Add(name);
             }
+            if(!usernameBox.Items.IsEmpty)
             usernameBox.Text = usernameBox.Items[0].ToString();
         }
 
@@ -99,7 +128,9 @@ namespace KailleraNET
             this.Visibility = Visibility.Hidden;
 
             k.BeginNewConnection(ip, port, username);
-            this.Close();
+            k.connectionFailed += () => Application.Current.Dispatcher.BeginInvoke(new Action(() => Show()));
+            k.connectionFailed += () => Application.Current.Dispatcher.BeginInvoke(new Action(() => k.closeAllWindows()));
+            this.Hide();
 
         }
 

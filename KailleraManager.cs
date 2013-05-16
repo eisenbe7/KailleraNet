@@ -12,6 +12,7 @@ using log4net;
 using System.Timers;
 using KailleraNET.Messages;
 using System.Text.RegularExpressions;
+using KailleraNET.Util;
 
 namespace KailleraNET
 {
@@ -26,6 +27,7 @@ namespace KailleraNET
         public delegate void OnUsersChanged(UserList users);
         public delegate void OnGamesChanged(GameList games);
         public delegate void OnGameJoinSuccess(Game game);
+        
 
         public OnGameJoinSuccess joinedGameSuccess;
 
@@ -38,7 +40,7 @@ namespace KailleraNET
         //Contains only "End Connection" by default
         public CloseInstance connectionClosed;
 
-        KailleraWindowMananger WindowMngr;
+        KailleraWindowController WindowMngr;
 
         KailleraTrayManager TrayMgr;
 
@@ -89,7 +91,7 @@ namespace KailleraNET
         public void Start(Object o)
         {
             connectionClosed += EndConnection;
-            WindowMngr = o as KailleraNET.KailleraWindowMananger;
+            WindowMngr = o as KailleraNET.KailleraWindowController;
             if (initConnection())
             {
                 //Send Logon
@@ -107,13 +109,10 @@ namespace KailleraNET
                  */
                 alive.Start(ip);
                 Recieve();
-
-
             }
             else //If we didn't connect successfully, return to the main window
             {
-                MainWindow m = new MainWindow();
-                m.Show();
+                KailleraWindowController.getMgr().connectionFailed();
             }
 
             
@@ -182,7 +181,6 @@ namespace KailleraNET
         private void Parse(byte[] msg, int count)
         {
             int currIndex = 1;
-            int c = count;
             for (int i = 0; i < count; i++)
             {
                 short serial = BitConverter.ToInt16(msg, currIndex);
@@ -364,7 +362,7 @@ namespace KailleraNET
             //Get text
             while (msg[currIndex] != 0)
             {
-                s.Append((char)msg[currIndex++]);
+                s.Append(Encoding.UTF8.GetString(msg, currIndex++, 1));
             }
             string text = s.ToString();
             //Get user instances
@@ -402,9 +400,7 @@ namespace KailleraNET
                 currIndex += 1 + 4 + 2 + 1; //null, ping, id, connection
             }
 
-            //We should also add the current user
-            currGame.users.AddUser(users.GetUserFromName(this.username));
-            joinedGameSuccess(currGame);
+                joinedGameSuccess(currGame);
         }
 
         private void ProcessPlayerLeave(byte[] msg, int currIndex)
@@ -417,7 +413,14 @@ namespace KailleraNET
             //if the current game is null it means you have already left
             if (currGame != null)
             {
-                currGame.users.RemoveUser(users.GetUserFromName(s.ToString()));
+                var leftPlayer = users.GetUserFromName(s.ToString());
+
+                currGame.users.RemoveUser(leftPlayer);
+
+                if (leftPlayer.Category.Equals("Buddies"))
+                {
+                    KailleraTrayManager.Instance.handleTrayEvent(TrayFlags.PopValues.buddyLeftGame, leftPlayer);
+                }
 
                 GUIBundle playerLeftBundle = new GUIBundle();
                 playerLeftBundle.Users = new UserList(currGame.users);
@@ -433,7 +436,7 @@ namespace KailleraNET
         /// <param name="currIndex"></param>
         private void ProcessPlayerJoin(byte[] msg, int currIndex)
         {
-            currIndex += 1;
+            currIndex += 2;
             int gameId = BitConverter.ToInt32(msg, currIndex);
             currIndex += 4;
             StringBuilder s = new StringBuilder();
@@ -442,15 +445,27 @@ namespace KailleraNET
                 s.Append((char)msg[currIndex++]);
             }
 
+            currIndex++;
+
             int ping = BitConverter.ToInt32(msg, currIndex);
             currIndex += 4;
-            int userID = BitConverter.ToInt32(msg, currIndex);
+            int userID = BitConverter.ToInt16(msg, currIndex);
 
-            currIndex += 4;
+            currIndex += 2;
             byte connection = msg[currIndex];
 
+            User newPlayer = users.GetUserFromID(userID);
+
+            //This is bad!
+            if (newPlayer == null) return;
+
+            if (newPlayer.Category.Equals("Buddies"))
+            {
+                KailleraTrayManager.Instance.handleTrayEvent(TrayFlags.PopValues.buddyJoinedGame, newPlayer);
+            }
+
             if(currGame != null)
-                currGame.users.AddUser(users.GetUserFromID(userID));
+                currGame.users.AddUser(newPlayer);
             GUIBundle playerJoinedBundle = new GUIBundle();
             playerJoinedBundle.Users = new UserList(currGame.users);
             playerJoinedBundle.gameNum = currGame.id;
@@ -482,16 +497,16 @@ namespace KailleraNET
 
         private void ProcessGameCreate(byte[] msg, int currIndex)
         {
-
+            string userHost;
             Game newGame = new Game();
             currIndex++;
             StringBuilder s = new StringBuilder();
             while (msg[currIndex] != 0)
                 s.Append((char)msg[currIndex++]);
-            User host = users.GetUserFromName(s.ToString());
+            userHost = s.ToString();
+            User host = users.GetUserFromName(userHost);
 
             newGame.host = host;
-            
 
             newGame.gameHost = s.ToString();
 
@@ -501,6 +516,16 @@ namespace KailleraNET
             while (msg[currIndex] != 0)
                 s.Append((char)msg[currIndex++]);
             newGame.name = s.ToString();
+
+            if (host == null) return;
+
+            if (host.Category.Equals("Buddies"))
+                KailleraTrayManager.Instance.handleTrayEvent(TrayFlags.PopValues.gameCreated, host, newGame.name);
+
+            if (users.GetUserFromName(username).Equals(host))
+            {
+                currGame = newGame;
+            }
             
             s.Clear();
             currIndex++;
@@ -524,7 +549,18 @@ namespace KailleraNET
 
             while (msg[currIndex++] != 0) ;
             int userID = BitConverter.ToInt16(msg, currIndex);
-            users.RemoveUser(users.GetUserFromID(userID));
+
+            var leftUser = users.GetUserFromID(userID);
+
+            if (leftUser == null)
+            {
+                return;
+            }
+
+            if (leftUser.Category.Equals("Buddies"))
+                KailleraTrayManager.Instance.handleTrayEvent(TrayFlags.PopValues.buddyLeftServer, leftUser);
+
+            users.RemoveUser(leftUser);
             GUIBundle bund = new GUIBundle();
             bund.Users = new UserList(users);
             WindowMngr.updateWindow(bund);
@@ -532,7 +568,12 @@ namespace KailleraNET
 
         private void ProcessUserJoin(byte[] msg, int currIndex)
         {
-            users.AddUser(User.ParseUserJoined(msg, currIndex));
+            var newUser = User.ParseUserJoined(msg, currIndex);
+
+            if (newUser.Category.Equals("Buddies"))
+                KailleraTrayManager.Instance.handleTrayEvent(TrayFlags.PopValues.buddyJoinedServer, newUser);
+
+            users.AddUser(newUser);
             GUIBundle bund = new GUIBundle();
             bund.Users = new UserList(users);
 
@@ -597,7 +638,7 @@ namespace KailleraNET
             client.Send(buff, buff.Length, ip);
             log.Info("Original Local end point is: " + client.Client.LocalEndPoint);
             IPEndPoint p = client.Client.LocalEndPoint as IPEndPoint;
-            client.Client.ReceiveTimeout = 3000;
+            client.Client.ReceiveTimeout = 1500;
             byte[] rec;
             try
             {
@@ -677,6 +718,16 @@ namespace KailleraNET
             tempCurrGame = game;
             messager.SendMessages(client);
         }
+        
+        /// <summary>
+        /// Joins a game and launches the game window
+        /// </summary>
+        public void createGame()
+        {
+            messager.AddMessages(new CreateGame());
+            messager.SendMessages(client);
+            //joinedGameSuccess(myGame);
+        }
 
         /// <summary>
         /// Leaves the current game
@@ -686,6 +737,18 @@ namespace KailleraNET
             messager.AddMessages(new LeaveGame(username));
             messager.SendMessages(client);
             currGame = tempCurrGame = null;
+        }
+
+        public void sendPM(User user, string text)
+        {
+            while (text.Length >= 110)
+            {
+                string sendtext = text.Substring(0, 110);
+                string txt = text.Substring(110, text.Length - 110);
+                SendServerChatText("/msg " + user.id + " " + sendtext);
+                text = txt;
+            }
+            SendServerChatText("/msg " + user.id + " " + text);
         }
     }
 }

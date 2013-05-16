@@ -14,7 +14,7 @@ namespace KailleraNET.Views
 {
     class ChatViewModel
     {
-        ChatWindow wind;
+        public ChatWindow wind;
 
         private ObservableCollection<User> displayUsers = new ObservableCollection<User>();
         private System.Net.IPAddress ip;
@@ -61,7 +61,7 @@ namespace KailleraNET.Views
 
         }
 
-        public ChatViewModel(int gamenum, KailleraWindowMananger mgr, Game game = null)
+        public ChatViewModel(int gamenum, KailleraWindowController mgr, Game game = null)
         {
             wind = new ChatWindow();
             gameNumber = gamenum;
@@ -79,6 +79,8 @@ namespace KailleraNET.Views
 
             wind.Closed += (object sender, EventArgs e) => winClosed(sender, e);
 
+            wind.gameNumber = gamenum;
+
             //If this is a game chat, we want to leave the game upon window close
             if (gamenum != 0)
             {
@@ -88,7 +90,7 @@ namespace KailleraNET.Views
             wind.Show();
 
             //Make this the active window in the tray manager
-            KailleraTrayManager.Instance.ActiveWindow = wind;
+            KailleraTrayManager.Instance.addActiveWindow(wind);
         }
 
         private void beginLeaveGame(object sender, EventArgs e)

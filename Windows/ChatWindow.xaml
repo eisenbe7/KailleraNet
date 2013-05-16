@@ -14,14 +14,37 @@
         </Grid.ColumnDefinitions>
         <RichTextBox Name="richTextBox1" VerticalAlignment="Stretch" IsReadOnly="True" VerticalScrollBarVisibility="Visible" Margin="0,0,0,1" MinWidth="50" MinHeight="50" Background="#FFF2F2F2" TextChanged="richTextBox1_TextChanged" Focusable="False" />
         <TextBox Height="Auto" HorizontalAlignment="Stretch" Name="textBox1" VerticalAlignment="Stretch" Margin="0,0,0,-2" Grid.Row="1" TextChanged="textBox1_TextChanged_1" />
-        <ListBox HorizontalAlignment="Stretch" Name="listBox1" VerticalAlignment="Stretch" Grid.Column="1" MinWidth="82" Background="White" Grid.RowSpan="2">
+        <ListBox HorizontalAlignment="Stretch" Name="listBox1" VerticalAlignment="Stretch" Grid.Column="1" MinWidth="82" Background="White" Grid.RowSpan="2" SelectionMode="Extended">
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Add to Buddy List" Click="addToBuddyList">                        
-                    </MenuItem>
+                    <MenuItem Header="Add to Buddy List" Click="addToBuddyList"/>
+                    <MenuItem Header="Send Private Message" Click="sendPMs"/>
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>
         <GridSplitter Height="Auto" HorizontalAlignment="Left" Name="gridSplitter1" VerticalAlignment="Stretch" Width="2" ShowsPreview="True" Grid.Column="1" Grid.RowSpan="2" />
     </Grid>
+
+    <Window.Resources>
+        <local:ShowCurrGameCommand
+                x:Key="ShowCurrGameCommand"/>
+        <local:ShowServerChatWindowCommand
+                x:Key="ShowServerChatWindowCommand"/>
+        <local:ShowUsersWindowCommand
+                x:Key="ShowUsersWindowCommand"/>
+        <local:ShowGameListCommand
+                x:Key="ShowGameListCommand"/>
+        <local:BeginDisconnectCommand
+                x:Key="BeginDisconnectCommand"/>
+        <local:LeaveGameCommand
+            x:Key="LeaveGameCommand"/>
+    </Window.Resources>
+    
+    <Window.InputBindings>
+        <KeyBinding Key="Q" Modifiers="Control" Command="{StaticResource LeaveGameCommand}"/>
+        <KeyBinding Key="U" Modifiers="Control" Command="{StaticResource ShowUsersWindowCommand}"/>
+        <KeyBinding Key="D" Modifiers="Control" Command="{StaticResource BeginDisconnectCommand}"/>
+    </Window.InputBindings>
+
+
 </Window>

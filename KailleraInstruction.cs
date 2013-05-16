@@ -13,7 +13,7 @@ namespace KailleraNET
     /// Note:  Instruction classes include the "packed_instruction" header
     /// </summary>
     abstract class KailleraInstruction
-    {
+    { 
         public byte id { get; set; }
         public int length { get; protected set; } //Length in bytes
         public Boolean userSent;

@@ -7,7 +7,7 @@ namespace KailleraNET.Instructions
 {
     class UserLogonInstruction : KailleraInstruction
     {
-        private string clientName = "Jaillera\0";
+        private string clientName = "KailleraNET 0.8\0";
         private string user;
         public Byte connection;
 

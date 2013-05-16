@@ -16,6 +16,8 @@ namespace KailleraNET
         public byte connection;
         private string category;
 
+        public int sortOrder { get; set; }
+
         public string Category
         {
             get
@@ -24,9 +26,20 @@ namespace KailleraNET
             }
             set
             {
-                category = value;
-                if("Buddies".Equals(value))
+                if ("Buddies".Equals(value))
+                {
                     SettingsManager.getMgr().addBuddy(Name);
+                }
+                if ("Ignored".Equals(value))
+                {
+                }
+                if ("Users".Equals(value) && category.Equals("Buddies"))
+                {
+                    SettingsManager.getMgr().removeBuddy(Name);
+                }
+
+                category = value;
+
             }
         }
 
@@ -62,7 +75,9 @@ namespace KailleraNET
             user.ping = BitConverter.ToInt32(msg, offset);
             offset += 4;
             user.connection = msg[offset];
+
             user.assignCategory();
+
             return user;
         }
 
@@ -93,6 +108,11 @@ namespace KailleraNET
             if (SettingsManager.getMgr().isBuddy(Name))
             {
                 Category = "Buddies";
+            }
+
+            if (SettingsManager.getMgr().isIgnored(Name))
+            {
+                Category = "Ignored";
             }
         }
     }

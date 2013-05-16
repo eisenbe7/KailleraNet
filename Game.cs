@@ -9,7 +9,7 @@ namespace KailleraNET
     {
         public string name { get; set; }
         public int id { get; set; }
-        public string emuName { get; set; }
+        public string emuName;
         public string users_count;
         public int numPlayers;
         public int maxPlayers;

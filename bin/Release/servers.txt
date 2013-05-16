@@ -5,3 +5,4 @@ Remz Domain - MK server,199.38.181.239:27888
 West Wonderland,69.90.34.55:27894
 Server,69.172.242.150:27888
 Test Server 1,66.175.211.87:27888
+Pancadaria,177.179.160.165:27888

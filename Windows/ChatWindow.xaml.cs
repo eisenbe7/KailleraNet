@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading;
 using KailleraNET.Util;
+using System.Windows.Threading;
 
 namespace KailleraNET
 {
@@ -34,8 +35,16 @@ namespace KailleraNET
         public delegate void UpdateGUI(GUIBundle bundle);
         public UpdateGUI updater;
 
+
+        /// <summary>
+        /// Adds the user to the buddy list
+        /// </summary>
+        /// <param name="user"></param>
         public delegate void AddBuddyList(User user);
         public AddBuddyList addBuddyList;
+
+        public delegate void SendPM(User user, string text);
+        public SendPM sendPM;
 
         private ObservableCollection<User> displayUsers = new ObservableCollection<User>();
         private System.Net.IPAddress ip;
@@ -57,33 +66,16 @@ namespace KailleraNET
             {
                 value = displayUsers;
             }
-
         }
 
         public ChatWindow()
         {
-        //    gameNumber = gamenum;
-        //    Userup += UpdateUsers;
+
             updater += WindowUpdate;
             InitializeComponent();
-        //    listBox1.ItemsSource = DisplayUsers;
-        //    //Set small line height to avoid large line breaks
-        //    Paragraph p = richTextBox1.Document.Blocks.FirstBlock as Paragraph;
-        //    p.LineHeight = 1;
-        //    textBox1.KeyDown += mgr.Chat_sendMessageIfEnter;+
+            Closing += Window_Closing;
 
             richTextBox1.IsDocumentEnabled = true;
-        }
-
-        public void Start(System.Net.IPAddress ip, int port, string username)
-        {
-/*          updater += WindowUpdate;
-            Userup += UpdateUsers;
-            KailleraMananger mgr = new KailleraMananger(ip, port, username);
-            Thread KManager = new Thread(new ParameterizedThreadStart(mgr.Start));
-            mgr.connectionClosed += connectionClosed;
-            KManager.Start(updater);
- */
         }
 
         private void textBox1_TextChanged(object sender, TextChangedEventArgs e)
@@ -111,6 +103,10 @@ namespace KailleraNET
 
                 Dispatcher.BeginInvoke((Action)(() => 
                 {
+                    //The message will not appear if ignored
+                    if (SettingsManager.getMgr().isIgnored(bundle.TargetUserString)) return;
+
+
                     //Stupid text coloring!  Better way to do this using flow documents?
 
                     Random rand = new Random();
@@ -259,10 +255,51 @@ namespace KailleraNET
 
         private void addToBuddyList(object sender, EventArgs e)
         {
-            if (addBuddyList != null && listBox1.SelectedItem != null)
+            if (addBuddyList != null && listBox1.SelectedItems != null)
             {
-                addBuddyList((User)listBox1.SelectedItem);
+                foreach (var item in listBox1.SelectedItems)
+                {
+                   addBuddyList((User)item);
+                }
             }
+        }
+
+
+        /// <summary>
+        /// Sends a private message to a user
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void sendPMs(object sender, EventArgs e)
+        {
+            if (sendPM != null && listBox1.SelectedItems != null)
+            {
+                string text = Microsoft.VisualBasic.Interaction.InputBox("Please enter your message", "Message", "", 100, 100);
+                if (String.IsNullOrWhiteSpace(text)) return;
+                foreach (var item in listBox1.SelectedItems)
+                {
+                    sendPM((User)item, text);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Hides the window and does not close it
+        /// Code from: http://balajiramesh.wordpress.com/2008/07/24/hide-a-window-instead-of-closing-it-in-wpf/
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            //Do some stuff here 
+            //Hide Window
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Background, (DispatcherOperationCallback)delegate(object o)
+            {
+                Hide();
+                return null;
+            }, null);
+            //Do not close application
+            e.Cancel = true;
         }
 
 

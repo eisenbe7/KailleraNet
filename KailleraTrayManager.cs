@@ -48,7 +48,9 @@ namespace KailleraNET
         /// Private constructor to prevent multiple instances
         /// </summary>
         private KailleraTrayManager()
-        {}
+        {
+
+        }
 
         public delegate void onTrayClick();
 
@@ -57,7 +59,7 @@ namespace KailleraNET
         /// <summary>
         /// Current window to re-activate when clicked
         /// </summary>
-        Window activeWindow;
+        List<Window> activeWindow = new List<Window>();
 
         TaskbarIcon kIcon;      
 
@@ -65,26 +67,30 @@ namespace KailleraNET
         /// Sets/gets the active window for the tray manager.
         /// This will be expanded to multiple windows in the future
         /// </summary>
-        public Window ActiveWindow
-        {
-            set
-            {
+        public void addActiveWindow(Window value)
+        {        
                 if (!TrayFlags.containsType(value.GetType())) return;
-                activeWindow = value;
-
-            }
-            get
-            {
-                return activeWindow;
-            }
+                activeWindow.Add(value);
         }
+
+        public void clearWindows()
+        {
+            activeWindow.Clear();
+        }
+
+        public void removeWindow(Window w)
+        {
+            if(activeWindow.Contains(w))
+                activeWindow.Remove(w);
+        }
+
+        public KailleraWindowController windowMgr;
 
         public void setIcon(TaskbarIcon currIcon)
         {
             kIcon = currIcon;
             kIcon.TrayLeftMouseDown += handleTrayClick;
             kIcon.TrayBalloonTipClicked += handleTrayClick;
-            kIcon.ToolTipText = "KailleraNET";    
         }
 
         /// <summary>
@@ -101,8 +107,15 @@ namespace KailleraNET
 
             if (currEvent != TrayFlags.PopValues.None)
             {
-                activeWindow.Visibility = Visibility.Visible;
-                activeWindow.WindowState = WindowState.Normal;
+                foreach (var wind in activeWindow)
+                {
+                    if (TrayFlags.handlesEvent(wind, currEvent))
+                    {                      
+                            wind.Visibility = Visibility.Visible;
+                            wind.WindowState = WindowState.Normal;
+                            wind.Show();                        
+                    }
+                }
             }
             currEvent = TrayFlags.PopValues.None;
         }
@@ -114,24 +127,37 @@ namespace KailleraNET
         /// <param name="flags"></param>
         public void handleTrayEvent(TrayFlags.PopValues flag, User targUser = null, string keyword = null)
         {
+            if (!SettingsManager.getMgr().isNotifyEnabled(flag)) return;
 
-            if (!TrayFlags.handlesEvent(activeWindow, flag))
+            foreach (Window w in activeWindow)
             {
-                log.Info("Received event: " + flag.ToString() + ". Ignoring - " + activeWindow.ToString() + " does not accept event");
+                if (!TrayFlags.handlesEvent(w, flag))
+                {
+                    log.Info("Received event: " + flag.ToString() + ". Ignoring - " + activeWindow.ToString() + " does not accept event");
+                    continue;
+                }
+
+                
+
+                currEvent = flag;
+                this.targUser = targUser;
+                this.keyword = keyword;
+
+                string message = TrayFlags.trayLang[currEvent];
+                message = message.Replace("#", targUser.Name);
+                message = message.Replace("$", keyword);
+
+                log.Info("Recieved tray event: " + flag.ToString() + ", with targUser: " + targUser.ToString() + ", message: " + message);
+
+                kIcon.ShowBalloonTip("Kaillera Event", message, BalloonIcon.Info);
                 return;
             }
+        }
 
-            currEvent = flag;
-            this.targUser = targUser;
-            this.keyword = keyword;
 
-            string message = TrayFlags.trayLang[currEvent];
-            message = message.Replace("#", targUser.Name);
-            message = message.Replace("$", keyword);
-
-            log.Info("Recieved tray event: " + flag.ToString() + ", with targUser: " + targUser.ToString() + ", message: " + message);
-
-            kIcon.ShowBalloonTip("Kaillera Event", message, BalloonIcon.Info);
+        internal void shutDown()
+        {
+            kIcon.Dispose();
         }
     }
 }

@@ -57,11 +57,26 @@ namespace KailleraNET.Util
         public void logChat(string s)
         {
             if (!File.Exists(CleanInput(LogStr))) File.Create(CleanInput(LogStr));
-            using(var log = File.AppendText(CleanInput(LogStr)))
+            try
             {
-                log.WriteLine(DateTime.Now.ToString() + ": " + s);
-            }
+                using (var log = File.AppendText(CleanInput(LogStr)))
+                {
+                    try
+                    {
+                        log.WriteLine(DateTime.Now.ToString() + ": " + s);
+                    }
+                    //If the file is in use or something, we just won't write it.  Whatever.
+                    catch (Exception)
+                    {
 
+                    }
+                    finally
+                    {
+                        log.Flush();
+                    }
+                }
+            }
+            catch (Exception e) { }
         }
 
         static string CleanInput(string strIn)

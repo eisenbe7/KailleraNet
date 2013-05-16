@@ -49,15 +49,24 @@ namespace KailleraNET.Util
 
         public static Boolean handlesEvent(Object o, PopValues flags)
         {
+            if (o as ChatWindow != null)
+            {
+                if (((ChatWindow)o).gameNumber == 0)
+                {
+                    return flags.HasFlag(PopValues.pmRecieved);
+                }
+            }
             return trayDict[o.GetType()].HasFlag(flags);
         }
 
 
         static TrayFlags()
         {
-            trayDict.Add(typeof(ChatWindow), PopValues.buddyJoinedServer | PopValues.buddyLeftServer | PopValues.keywordTyped | PopValues.pmRecieved);
+            trayDict.Add(typeof(ChatWindow), PopValues.buddyJoinedGame | PopValues.buddyLeftGame | PopValues.keywordTyped | PopValues.pmRecieved);
 
             trayDict.Add(typeof(GamesWindow), PopValues.gameCreated);
+
+            trayDict.Add(typeof(UsersWindow), PopValues.buddyJoinedServer | PopValues.buddyLeftServer);                      
 
             // # replaced by username
             // $ replaced by keyword
@@ -67,6 +76,7 @@ namespace KailleraNET.Util
             trayLang.Add(PopValues.keywordTyped, "$ has been typed by #");
             trayLang.Add(PopValues.buddyJoinedGame, "# has joined the game");
             trayLang.Add(PopValues.buddyLeftGame, "# has left the game");
+            trayLang.Add(PopValues.gameCreated, "# has created a game: $");
 
         }
     }

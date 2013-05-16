@@ -9,14 +9,14 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>KailleraNET</RootNamespace>
-    <AssemblyName>WpfApplication1</AssemblyName>
+    <AssemblyName>KailleraNET</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
+    <PublishUrl>C:\Coding\KailleraNET\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -26,7 +26,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>1</ApplicationRevision>
+    <AutorunEnabled>true</AutorunEnabled>
+    <ApplicationRevision>3</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -63,12 +64,20 @@
   <PropertyGroup>
     <SignManifests>true</SignManifests>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hardcodet.Wpf.TaskbarNotification">
       <HintPath>..\..\..\..\..\..\..\Coding\wpf-notifyicon\NotifyIconWpf\bin\Release\Hardcodet.Wpf.TaskbarNotification.dll</HintPath>
     </Reference>
     <Reference Include="log4net">
       <HintPath>..\..\..\Code Snippets\Visual C#\My Code Snippets\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Nini">
+      <HintPath>..\..\..\..\..\..\..\Coding\Nini\Bin\DotNet\2.0\Release\Nini.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -92,8 +101,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="GUIBundle.cs" />
+    <Compile Include="Hotkeys\BeginDisconnectHotkey.cs" />
+    <Compile Include="Hotkeys\MinimizeAllWindowsHotkey.cs" />
+    <Compile Include="Hotkeys\ShowGameListHotkey.cs" />
+    <Compile Include="Hotkeys\ShowServerChatHotkey.cs" />
+    <Compile Include="Hotkeys\ShowUserListHotkey.cs" />
     <Compile Include="KailleraTrayManager.cs" />
     <Compile Include="KailleraWindowMananger.cs" />
+    <Compile Include="Messages\CreateGame.cs" />
     <Compile Include="Messages\GameChatMsg.cs" />
     <Compile Include="Messages\JoinGame.cs" />
     <Compile Include="Messages\KeepAliveInstruction.cs" />
@@ -104,14 +119,23 @@
     <Compile Include="Messages\ServerChatMsg.cs" />
     <Compile Include="Messages\UserLogon.cs" />
     <Compile Include="SettingsManager.cs" />
+    <Compile Include="Tray Commands\BeginDisconnectCommand.cs" />
+    <Compile Include="Tray Commands\CollapseToTrayCommand.cs" />
+    <Compile Include="Tray Commands\LeaveGameCommand.cs" />
+    <Compile Include="Tray Commands\ShowCurrGameCommand.cs" />
+    <Compile Include="Tray Commands\ShowGameListCommand.cs" />
+    <Compile Include="Tray Commands\ShowServerChatWindowCommand.cs" />
+    <Compile Include="Tray Commands\ShowUsersWindowCommand.cs" />
     <Compile Include="UDPMessenger.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UserList.cs" />
     <Compile Include="Util\ChatLogger.cs" />
+    <Compile Include="Util\HotkeyHost.cs" />
     <Compile Include="Util\TrayFlags.cs" />
     <Compile Include="Util\ColorUtil.cs" />
     <Compile Include="Util\MasterServerList.cs" />
     <Compile Include="Util\Server.cs" />
+    <Compile Include="Util\WindowFlags.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\GameListViewModel.cs" />
     <Compile Include="ViewModels\ServerListViewModel.cs" />
